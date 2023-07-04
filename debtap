@@ -23,8 +23,8 @@ lightred='\e[1;31m'
 red='\e[0;31m'
 lightblue='\e[1;34m'
 NC='\e[0m'
-bold=`tput bold`
-normal=`tput sgr0`
+bold=$(tput bold)
+normal=$(tput sgr0)
 
 # Options, help, database update and error messages
 for i in "$@"; do
@@ -70,8 +70,7 @@ elif [[ $update == set ]]; then
         mkdir -p /var/cache/debtap 2> /dev/null
         chmod 755 /var/cache/debtap
         echo -e "${lightgreen}==>${NC} ${bold}Synchronizing pkgfile database...${normal}"
-        pkgfile -u
-        if [[ $(echo $?) != 0 ]]; then
+        if ! pkgfile -u; then
             echo -e "${red}Synchronization failed. Exiting...${NC}"; exit 1
         else
             echo -e "${lightgreen}==>${NC} ${bold}Synchronizing debtap database...${normal}"
@@ -82,7 +81,7 @@ elif [[ $update == set ]]; then
             elif [[ "$(uname -m)" == "aarch64" ]]; then
                 _arch=arm64
             fi
-            ubuntu_latest_stable_version=`curl -k -s https://packages.ubuntu.com | grep option | gawk -F '=' '{print $2}' | gawk '{print $1}' | grep -v option | tac | sed -n 3'{p;q;}' | sed s'/\("\|-updated\|-backports\)//g'`
+            ubuntu_latest_stable_version=$(curl -k -s https://packages.ubuntu.com | grep option | gawk -F '=' '{print $2}' | gawk '{print $1}' | grep -v option | tac | sed -n 3'{p;q;}' | sed s'/\("\|-updated\|-backports\)//g')
             curl -k -C - -f http://ftp.debian.org/debian/dists/sid/main/Contents-$_arch.gz > /var/cache/debtap/debian-main-packages-files.gz
             gzip -df /var/cache/debtap/debian-main-packages-files.gz
             curl -k -C - -f http://ftp.debian.org/debian/dists/sid/non-free/Contents-$_arch.gz > /var/cache/debtap/debian-non-free-packages-files.gz
@@ -94,22 +93,19 @@ elif [[ $update == set ]]; then
             else
                 curl -k -C - -f http://ports.ubuntu.com/ubuntu-ports/dists/$ubuntu_latest_stable_version/Contents-$_arch.gz > /var/cache/debtap/ubuntu-packages-files.gz
             fi
-            gzip -df /var/cache/debtap/ubuntu-packages-files.gz
-            if [[ $(echo $?) != 0 ]]; then
+            if ! gzip -df /var/cache/debtap/ubuntu-packages-files.gz; then
                 echo -e "${red}Synchronization failed. Exiting...${NC}"; exit 1
             else
                 echo -e "${lightgreen}==>${NC} ${bold}Downloading latest virtual packages list...${normal}"
                 curl -k -L https://github.com/helixarch/virtual-packages-list-generator/archive/master.tar.gz > /var/cache/debtap/master.tar.gz
                 tar xfz /var/cache/debtap/master.tar.gz -C /var/cache/debtap
                 mv /var/cache/debtap/virtual-packages-list-generator-master/virtual-packages /var/cache/debtap
-                rm -rf /var/cache/debtap/master.tar.gz /var/cache/debtap/virtual-packages-list-generator-master
-                if [[ $(echo $?) != 0 ]]; then
+                if ! rm -rf /var/cache/debtap/master.tar.gz /var/cache/debtap/virtual-packages-list-generator-master; then
                     echo -e "${red}Downloading failed. Exiting...${NC}"; exit 1
                 else
                     echo -e "${lightgreen}==>${NC} ${bold}Downloading latest AUR packages list...${normal}"
                     curl -k -C - -f https://aur.archlinux.org/packages.gz > /var/cache/debtap/aur-packages.gz
-                    gzip -df /var/cache/debtap/aur-packages.gz
-                    if [[ $(echo $?) != 0 ]]; then
+                    if ! gzip -df /var/cache/debtap/aur-packages.gz; then
                         echo -e "${red}Downloading failed. Exiting...${NC}"; exit 1
                     else    
                         echo -e "${lightgreen}==>${NC} ${bold}Generating base group packages list...${normal}"
@@ -162,15 +158,15 @@ tar_extract_cmd() {
 }
 
 # Defining package with full path & defining and creating working directory
-package_with_full_path="`readlink -f "${@: -1}"`"
-working_directory="`pwd`/`basename "${@: -1}" | tr '[:upper:]' '[:lower:]' | sed s'/\.deb$//'`-working-directory"
+package_with_full_path=$(readlink -f "${@: -1}")
+working_directory=$(pwd)/$(basename "${@: -1}" | tr '[:upper:]' '[:lower:]' | sed s'/\.deb$//')-working-directory
 rm -rf "$working_directory" 2> /dev/null
 mkdir "$working_directory" 2> /dev/null
-if [[ $(echo $?) != 0 ]]; then
+if [[ $? != 0 ]]; then
 	echo -e "${red}Error: Cannot create working directory, permission denied. Exiting...${NC}"
 	exit 1
 fi
-cd "$working_directory"
+cd "$working_directory" || exit
 
 # Extracting package data and metadata in working directory (also checking package architecture, if you are running the pseudo option)
 echo -e "${lightgreen}==>${NC} ${bold}Extracting package data...${normal}"
@@ -324,7 +320,7 @@ if [[ -e usr/local/sbin ]]; then
 	mkdir usr/bin 2> /dev/null; mv usr/local/sbin/* usr/bin; rm -rf usr/local/sbin
 fi
 if [[ -e usr/share/applications ]]; then
-	ls usr/share/applications/*.desktop | while read line; do
+	ls usr/share/applications/*.desktop | while read -r line; do
 		sed -i -e s'/^Exec=\/bin\//Exec=\/usr\/bin\//g' -e s'/^Exec=\/sbin\//Exec=\/usr\/bin\//g' -e s'/^Exec=\/usr\/sbin\//Exec=\/usr\/bin\//g' -e s'/^Exec=\/usr\/games\//Exec=\/usr\/bin\//g' -e s'/^Exec=\/usr\/local\/bin\//Exec=\/usr\/bin\//g' -e s'/^Exec=\/usr\/local\/sbin\//Exec=\/usr\/bin\//g' -e s'/^Exec=\/usr\/local\/games\//Exec=\/usr\/bin\//g' "$line" 2> /dev/null
 	done
 fi
@@ -384,30 +380,30 @@ echo -e "${lightgreen}==>${NC} ${bold}Generating .PKGINFO file...${normal}"
 
 # Generating pkgname field
 if [[ $pseudo == set ]] && [[ $(ls -A usr/lib32 2> /dev/null) ]] && [[ ! $(ls -A usr/bin 2> /dev/null) ]]; then
-	for i in {git,bzr,darcs,hg}; do
+	for i in git bzr darcs hg; do
 		if [[ $(grep -i ^Version: control | gawk '{print $2}' | grep -q $i; echo $?) == 0 ]]; then
-			echo "pkgname = lib32-`grep -i ^Package: control | gawk '{print $2}' | tr '[:upper:]' '[:lower:]'`"-$i | sed s"/-$i-$i$/-$i/" | sed s'/--/-/g' > .PKGINFO
+			echo "pkgname = lib32-$(grep -i ^Package: control | gawk '{print $2}' | tr '[:upper:]' '[:lower:]')"-$i | sed s"/-$i-$i$/-$i/" | sed s'/--/-/g' > .PKGINFO
 		fi
 	done
 	if [[ $(grep -i ^Version: control | gawk '{print $2}' | grep -q svn; echo $?) == 0 ]]; then
-		echo "pkgname = lib32-`grep -i ^Package: control | gawk '{print $2}' | tr '[:upper:]' '[:lower:]'`"-svn | sed s'/-svn-svn$/-svn/' | sed s'/--/-/g' > .PKGINFO
+		echo "pkgname = lib32-$(grep -i ^Package: control | gawk '{print $2}' | tr '[:upper:]' '[:lower:]')"-svn | sed s'/-svn-svn$/-svn/' | sed s'/--/-/g' > .PKGINFO
 	fi
 	for i in {cvs,CVS}; do
 		if [[ $(grep -i ^Version: control | gawk '{print $2}' | grep -q $i; echo $?) == 0 ]]; then
-			echo "pkgname = lib32-`grep -i ^Package: control | gawk '{print $2}' | tr '[:upper:]' '[:lower:]'`"-cvs | sed s'/-cvs-cvs$/-cvs/' | sed s'/--/-/g' > .PKGINFO
+			echo "pkgname = lib32-$(grep -i ^Package: control | gawk '{print $2}' | tr '[:upper:]' '[:lower:]')"-cvs | sed s'/-cvs-cvs$/-cvs/' | sed s'/--/-/g' > .PKGINFO
 		fi
 	done
 	if [[ $(grep -i ^Version: control | gawk '{print $2}' | grep -q "svn\|git\|cvs\|CVS\|bzr\|darcs\|hg"; echo $?) != 0 ]]; then
-		echo "pkgname = lib32-`grep -i ^Package: control | gawk '{print $2}' | tr '[:upper:]' '[:lower:]'`" | sed s'/--/-/g' > .PKGINFO
+		echo "pkgname = lib32-$(grep -i ^Package: control | gawk '{print $2}' | tr '[:upper:]' '[:lower:]')" | sed s'/--/-/g' > .PKGINFO
 	fi
 else
-	for i in {git,bzr,darcs,hg}; do
+	for i in git bzr darcs hg; do
 		if [[ $(grep -i ^Version: control | gawk '{print $2}' | grep -q $i; echo $?) == 0 ]]; then
-			echo "pkgname = `grep -i ^Package: control | gawk '{print $2}' | tr '[:upper:]' '[:lower:]'`"-$i | sed s"/-$i-$i$/-$i/" | sed s'/--/-/g' > .PKGINFO
+			echo "pkgname = $(grep -i ^Package: control | gawk '{print $2}' | tr '[:upper:]' '[:lower:]')"-$i | sed s"/-$i-$i$/-$i/" | sed s'/--/-/g' > .PKGINFO
 		fi
 	done
 	if [[ $(grep -i ^Version: control | gawk '{print $2}' | grep -q svn; echo $?) == 0 ]]; then
-		echo "pkgname = `grep -i ^Package: control | gawk '{print $2}' | tr '[:upper:]' '[:lower:]'`"-svn | sed s'/-svn-svn$/-svn/' | sed s'/--/-/g' > .PKGINFO
+		echo "pkgname = $(grep -i ^Package: control | gawk '{print $2}' | tr '[:upper:]' '[:lower:]')"-svn | sed s'/-svn-svn$/-svn/' | sed s'/--/-/g' > .PKGINFO
 	fi
 	for i in {cvs,CVS}; do
 		if [[ $(grep -i ^Version: control | gawk '{print $2}' | grep -q $i; echo $?) == 0 ]]; then
@@ -3381,7 +3377,7 @@ echo -e "\n}" >> PKGBUILD
 pkgname="$(grep '^pkgname=' PKGBUILD | sed s'/^pkgname=//')"
 rm -rf "../$pkgname" 2> /dev/null
 mkdir "../$pkgname" 2> /dev/null
-if [[ $(echo $?) != 0 ]]; then
+if [[ $? != 0 ]]; then
 	echo -e "${red}Error: Cannot create PKGBUILD directory, permission denied. Removing leftover files and exiting...${NC}"
 	rm -rf "$working_directory"
 	rm -rf /tmp/debtap
