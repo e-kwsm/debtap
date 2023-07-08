@@ -591,7 +591,7 @@ done
 
 < tempfile06 sed s'/=/ = /g' | sed s'/>/ > /g' | sed s'/</ < /g' | sed s'/>  =/>=/g' | sed s'/<  =/<=/g' | sed s'/^lib32-\|-multilib$//g' > tempfile07
 
-cat tempfile07 | while read line; do
+while read line; do
     if [[ $(echo "$line" | wc -w) -eq 0 ]]; then
 		echo >> final-check-list
     elif [[ $(echo "$line" | wc -w) -eq 1 ]] || [[ $(echo "$line" | wc -w) -eq 3 ]]; then
@@ -600,7 +600,7 @@ cat tempfile07 | while read line; do
 		echo "`echo "$line" | gawk '{print $1}'` `echo "$line" | gawk '{print $2}'` `echo "$line" | gawk '{print $3}'`" >> final-check-list
 		echo "`echo "$line" | gawk '{print $1}'` `echo "$line" | gawk '{print $4}'` `echo "$line" | gawk '{print $5}'`" >> final-check-list
     fi
-done
+done < tempfile07
 
 for i in $(eval echo {1..$(cat `ls | grep initial-check-list` | wc -l)}); do
     if [[ $(sed -n ""$i"{p;q;}" final-check-list | gawk '{print $1}') == "" ]]; then
@@ -3381,7 +3381,7 @@ if [[ -e pkgbuildinstallations2 ]]; then
 	done
 fi
 if [[ -e pkgbuildinstallations1 ]] || [[ -e pkgbuildinstallations2 ]] || [[ -e pkgbuildinstallations32 ]] || [[ -e pkgbuildinstallations64 ]]; then
-	if [[ $(grep '^install' pkgbuildinstallations1 2> /dev/null | wc -l) != $(echo $(($(cat pkgbuildinstallations1 2> /dev/null | wc -l) + $(cat pkgbuildinstallations2 2> /dev/null | wc -l) + $(cat pkgbuildinstallations32 2> /dev/null | wc -l) + $(cat pkgbuildinstallations64 2> /dev/null | wc -l)))) ]]; then
+	if [[ $(grep '^install' pkgbuildinstallations1 2> /dev/null | wc -l) != $(echo $(($(wc -l 2> /dev/null < pkgbuildinstallations1) + $(wc -l 2> /dev/null < pkgbuildinstallations2) + $(wc -l 2> /dev/null < pkgbuildinstallations32) + $(wc -l 2> /dev/null < pkgbuildinstallations64)))) ]]; then
 		echo -e "\n	cd .." >> PKGBUILD
 	fi
 fi
