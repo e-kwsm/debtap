@@ -589,7 +589,7 @@ for i in $(for j in `cat tempfile05`; do echo $j-tempfile04; done); do
     fi
 done
 
-cat tempfile06 | sed s'/=/ = /g' | sed s'/>/ > /g' | sed s'/</ < /g' | sed s'/>  =/>=/g' | sed s'/<  =/<=/g' | sed s'/^lib32-\|-multilib$//g' > tempfile07
+< tempfile06 sed s'/=/ = /g' | sed s'/>/ > /g' | sed s'/</ < /g' | sed s'/>  =/>=/g' | sed s'/<  =/<=/g' | sed s'/^lib32-\|-multilib$//g' > tempfile07
 
 cat tempfile07 | while read line; do
     if [[ $(echo "$line" | wc -w) -eq 0 ]]; then
