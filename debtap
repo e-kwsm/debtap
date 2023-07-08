@@ -3371,7 +3371,7 @@ if [[ -e pkgbuildinstallations2 ]]; then
 	done
 fi
 if [[ -e pkgbuildinstallations1 ]] || [[ -e pkgbuildinstallations2 ]] || [[ -e pkgbuildinstallations32 ]] || [[ -e pkgbuildinstallations64 ]]; then
-	if [[ $(grep '^install' pkgbuildinstallations1 2> /dev/null | wc -l) != $(echo $(($(cat pkgbuildinstallations1 2> /dev/null | wc -l) + $(cat pkgbuildinstallations2 2> /dev/null | wc -l) + $(cat pkgbuildinstallations32 2> /dev/null | wc -l) + $(cat pkgbuildinstallations64 2> /dev/null | wc -l)))) ]]; then
+	if [[ $(grep '^install' pkgbuildinstallations1 2> /dev/null | wc -l) != $(echo $(($(wc -l 2> /dev/null < pkgbuildinstallations1) + $(wc -l 2> /dev/null < pkgbuildinstallations2) + $(wc -l 2> /dev/null < pkgbuildinstallations32) + $(wc -l 2> /dev/null < pkgbuildinstallations64)))) ]]; then
 		echo -e "\n	cd .." >> PKGBUILD
 	fi
 fi
