@@ -2652,7 +2652,7 @@ if [[ -e new-untranslated-names-only ]]; then
 fi
 
 # Appending untranslated packages names (if any exist) to the translated packages names list
-if [[ $(cat new-untranslated 2> /dev/null | wc -l) -ne 0 ]]; then
+if [[ $(wc -l 2> /dev/null < new-untranslated) -ne 0 ]]; then
     tac new-untranslated | sed s'/=/= /g' | sed s'/>/> /g' | sed s'/</< /g' | sed s'/> =/>=/g' | sed s'/< =/<=/g' >> final-check-list
     gawk '{print $1}' new-untranslated | sort -u > $(echo `ls | grep initial-check-list` | sed s'/initial-check-list/untranslated-names-only/')
 fi
@@ -3334,7 +3334,7 @@ fi
 echo -e "\npackage(){\n\n	# Extract package data" >> PKGBUILD
 echo "	$data_extract -f $data_tar_check -C \"\${pkgdir}\"" >> PKGBUILD
 if [[ -e pkgbuildinstallations1 ]] || [[ -e pkgbuildinstallations2 ]] || [[ -e pkgbuildinstallations32 ]] || [[ -e pkgbuildinstallations64 ]]; then
-	if [[ $(grep '^install' pkgbuildinstallations1 2> /dev/null | wc -l) != $(echo $(($(cat pkgbuildinstallations1 2> /dev/null | wc -l) + $(cat pkgbuildinstallations2 2> /dev/null | wc -l) + $(cat pkgbuildinstallations32 2> /dev/null | wc -l) + $(cat pkgbuildinstallations64 2> /dev/null | wc -l)))) ]]; then
+	if [[ $(grep '^install' pkgbuildinstallations1 2> /dev/null | wc -l) != $(echo $(($(wc -l 2> /dev/null < pkgbuildinstallations1) + $(wc -l 2> /dev/null < pkgbuildinstallations2) + $(wc -l 2> /dev/null < pkgbuildinstallations32) + $(wc -l 2> /dev/null < pkgbuildinstallations64)))) ]]; then
 		echo -e "\n	# Fix directory structure differences\n	cd \"\${pkgdir}\"" >> PKGBUILD
 	fi
 fi
