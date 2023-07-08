@@ -647,7 +647,7 @@ if [[ -e untranslated-names-only ]]; then
 		fi
     done
 
-    cat tempfile11 | sed s'/=/ = /g' | sed s'/>/ > /g' | sed s'/</ < /g' | sed s'/>  =/>=/g' | sed s'/<  =/<=/g' | sed s'/^lib32-\|-multilib$//g' > tempfile12
+    < tempfile11 sed s'/=/ = /g' | sed s'/>/ > /g' | sed s'/</ < /g' | sed s'/>  =/>=/g' | sed s'/<  =/<=/g' | sed s'/^lib32-\|-multilib$//g' > tempfile12
 
     cat tempfile12 | while read line; do
 		if [[ $(echo "$line" | wc -w) -eq 0 ]]; then
