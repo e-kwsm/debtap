@@ -603,11 +603,11 @@ cat tempfile07 | while read line; do
 done
 
 for i in $(eval echo {1..$(cat $(ls | grep initial-check-list) | wc -l)}); do
-    if [[ $(sed -n ""$i"{p;q;}" final-check-list | gawk '{print $1}') == "" ]]; then
-		echo $(sed -n ""$i"{p;q;}" $(ls | grep initial-check-list)) >> untranslated
-		echo $(sed -n ""$i"{p;q;}" $(ls | grep initial-check-list) | gawk '{print $1}') >> untranslated-names-only
-    elif [[ $(echo " $(echo $(grep ^pkgname .PKGINFO | gawk '{print $3}' | sed s'/-svn$\|-git$\|-cvs$\|-bzr$\|-darcs$\|-hg$//'){-svn,-git,-cvs,-bzr,-darcs,-hg,}) " | grep -q " $(sed -n ""$i"{p;q;}" final-check-list | gawk '{print $1}') "; echo $?) == 0 ]]; then
-		echo $(sed -n ""$i"{p;q;}" $(ls | grep initial-check-list) | sed s'/ //') >> missing-files
+    if [[ $(sed -n "$i{p;q;}" final-check-list | gawk '{print $1}') == "" ]]; then
+		echo $(sed -n "$i{p;q;}" $(ls | grep initial-check-list)) >> untranslated
+		echo $(sed -n "$i{p;q;}" $(ls | grep initial-check-list) | gawk '{print $1}') >> untranslated-names-only
+    elif [[ $(echo " $(echo $(grep ^pkgname .PKGINFO | gawk '{print $3}' | sed s'/-svn$\|-git$\|-cvs$\|-bzr$\|-darcs$\|-hg$//'){-svn,-git,-cvs,-bzr,-darcs,-hg,}) " | grep -q " $(sed -n "$i{p;q;}" final-check-list | gawk '{print $1}') "; echo $?) == 0 ]]; then
+		echo $(sed -n "$i{p;q;}" $(ls | grep initial-check-list) | sed s'/ //') >> missing-files
     fi
 done
 
@@ -661,11 +661,11 @@ if [[ -e untranslated-names-only ]]; then
     done
 
     for i in $(eval echo {1..$(cat untranslated | wc -l)}); do
-		if [[ $(tac final-check-list | sed -n ""$i"{p;q;}" | gawk '{print $1}') == "" ]]; then
-			echo $(tac untranslated | sed -n ""$i"{p;q;}") >> new-untranslated
-			echo $(tac untranslated | sed -n ""$i"{p;q;}" | gawk '{print $1}') >> new-untranslated-names-only
-		elif [[ $(echo " $(echo $(grep ^pkgname .PKGINFO | gawk '{print $3}' | sed s'/-svn$\|-git$\|-cvs$\|-bzr$\|-darcs$\|-hg$//'){-svn,-git,-cvs,-bzr,-darcs,-hg,}) " | grep -q " $(tac final-check-list | sed -n ""$i"{p;q;}" | gawk '{print $1}') "; echo $?) == 0 ]]; then
-			echo $(tac untranslated | sed -n ""$i"{p;q;}" | sed s'/ //') >> missing-files
+		if [[ $(tac final-check-list | sed -n "$i{p;q;}" | gawk '{print $1}') == "" ]]; then
+			echo $(tac untranslated | sed -n "$i{p;q;}") >> new-untranslated
+			echo $(tac untranslated | sed -n "$i{p;q;}" | gawk '{print $1}') >> new-untranslated-names-only
+		elif [[ $(echo " $(echo $(grep ^pkgname .PKGINFO | gawk '{print $3}' | sed s'/-svn$\|-git$\|-cvs$\|-bzr$\|-darcs$\|-hg$//'){-svn,-git,-cvs,-bzr,-darcs,-hg,}) " | grep -q " $(tac final-check-list | sed -n "$i{p;q;}" | gawk '{print $1}') "; echo $?) == 0 ]]; then
+			echo $(tac untranslated | sed -n "$i{p;q;}" | sed s'/ //') >> missing-files
 		fi
     done
 
