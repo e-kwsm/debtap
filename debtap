@@ -487,47 +487,47 @@ fi
 
 # Generating size field
 if [[ -e preinst ]]; then
-    preinst_size=$(ls -l | grep preinst | gawk '{print $5}')
+    preinst_size=$(ls -l preinst | gawk '{print $5}')
 else
     preinst_size=0
 fi
 if [[ -e postinst ]]; then
-    postinst_size=$(ls -l | grep postinst | gawk '{print $5}')
+    postinst_size=$(ls -l postinst | gawk '{print $5}')
 else
     postinst_size=0
 fi
 if [[ -e prerm ]]; then
-    prerm_size=$(ls -l | grep prerm | gawk '{print $5}')
+    prerm_size=$(ls -l prerm | gawk '{print $5}')
 else
     prerm_size=0
 fi
 if [[ -e postrm ]]; then
-    postrm_size=$(ls -l | grep postrm | gawk '{print $5}')
+    postrm_size=$(ls -l postrm | gawk '{print $5}')
 else
     postrm_size=0
 fi
 if [[ -e conffiles ]]; then
-    conffiles_size=$(ls -l | grep conffiles | gawk '{print $5}')
+    conffiles_size=$(ls -l conffiles | gawk '{print $5}')
 else
     conffiles_size=0
 fi
 if [[ -e pkgbuildinstallations1 ]]; then
-    pkgbuildinstallations1_size=$(ls -l | grep pkgbuildinstallations1 | gawk '{print $5}')
+    pkgbuildinstallations1_size=$(ls -l pkgbuildinstallations1 | gawk '{print $5}')
 else
     pkgbuildinstallations1_size=0
 fi
 if [[ -e pkgbuildinstallations2 ]]; then
-    pkgbuildinstallations2_size=$(ls -l | grep pkgbuildinstallations2 | gawk '{print $5}')
+    pkgbuildinstallations2_size=$(ls -l pkgbuildinstallations2 | gawk '{print $5}')
 else
     pkgbuildinstallations2_size=0
 fi
 if [[ -e pkgbuildinstallations32 ]]; then
-    pkgbuildinstallations32_size=$(ls -l | grep pkgbuildinstallations32 | gawk '{print $5}')
+    pkgbuildinstallations32_size=$(ls -l pkgbuildinstallations32 | gawk '{print $5}')
 else
     pkgbuildinstallations32_size=0
 fi
 if [[ -e pkgbuildinstallations64 ]]; then
-    pkgbuildinstallations64_size=$(ls -l | grep pkgbuildinstallations64 | gawk '{print $5}')
+    pkgbuildinstallations64_size=$(ls -l pkgbuildinstallations64 | gawk '{print $5}')
 else
     pkgbuildinstallations64_size=0
 fi
