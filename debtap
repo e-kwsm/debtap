@@ -180,7 +180,7 @@ if [[ $(echo $?) != 0 ]]; then
 	echo -e "${red}Error: Cannot create working directory, permission denied. Exiting...${NC}"
 	exit 1
 fi
-cd "$working_directory"
+cd "$working_directory" || exit
 
 # Extracting package data and metadata in working directory (also checking package architecture, if you are running the pseudo option)
 echo -e "${lightgreen}==>${NC} ${bold}Extracting package data...${normal}"
