@@ -386,15 +386,15 @@ echo -e "${lightgreen}==>${NC} ${bold}Generating .PKGINFO file...${normal}"
 if [[ $pseudo == set ]] && [[ $(ls -A usr/lib32 2> /dev/null) ]] && [[ ! $(ls -A usr/bin 2> /dev/null) ]]; then
 	for i in {git,bzr,darcs,hg}; do
 		if [[ $(grep -i ^Version: control | gawk '{print $2}' | grep -q $i; echo $?) == 0 ]]; then
-			echo "pkgname = lib32-`grep -i ^Package: control | gawk '{print $2}' | tr '[:upper:]' '[:lower:]'`"-$i | sed s"/-$i-$i$/-$i/" | sed s'/--/-/g' > .PKGINFO
+			echo "pkgname = lib32-`grep -i ^Package: control | gawk '{print $2}' | tr '[:upper:]' '[:lower:]'`"-$i | sed -e s"/-$i-$i$/-$i/" -e s'/--/-/g' > .PKGINFO
 		fi
 	done
 	if [[ $(grep -i ^Version: control | gawk '{print $2}' | grep -q svn; echo $?) == 0 ]]; then
-		echo "pkgname = lib32-`grep -i ^Package: control | gawk '{print $2}' | tr '[:upper:]' '[:lower:]'`"-svn | sed s'/-svn-svn$/-svn/' | sed s'/--/-/g' > .PKGINFO
+		echo "pkgname = lib32-`grep -i ^Package: control | gawk '{print $2}' | tr '[:upper:]' '[:lower:]'`"-svn | sed -e s'/-svn-svn$/-svn/' -e s'/--/-/g' > .PKGINFO
 	fi
 	for i in {cvs,CVS}; do
 		if [[ $(grep -i ^Version: control | gawk '{print $2}' | grep -q $i; echo $?) == 0 ]]; then
-			echo "pkgname = lib32-`grep -i ^Package: control | gawk '{print $2}' | tr '[:upper:]' '[:lower:]'`"-cvs | sed s'/-cvs-cvs$/-cvs/' | sed s'/--/-/g' > .PKGINFO
+			echo "pkgname = lib32-`grep -i ^Package: control | gawk '{print $2}' | tr '[:upper:]' '[:lower:]'`"-cvs | sed -e s'/-cvs-cvs$/-cvs/' -e s'/--/-/g' > .PKGINFO
 		fi
 	done
 	if [[ $(grep -i ^Version: control | gawk '{print $2}' | grep -q "svn\|git\|cvs\|CVS\|bzr\|darcs\|hg"; echo $?) != 0 ]]; then
