@@ -576,13 +576,13 @@ done
 
 for i in $(for j in `cat tempfile05`; do echo $j-tempfile04; done); do
     k=`sort $i | uniq -c | gawk '{print $1}' | sort -n | tail -1`
-    if [[ $(sort $i | uniq -c | gawk '{print $1}' | sort -n | grep "^$k$" | wc -l) -ge 2 ]]; then
+    if [[ $(sort $i | uniq -c | gawk '{print $1}' | sort -n | grep -c "^$k$") -ge 2 ]]; then
 		for l in `cat $i`; do
 			for m in $(sort $i | uniq -c | gawk '{print $1,$2}' | sort -n | grep "^$k " | gawk '{print $2}'); do
 				echo $l | grep "^$m$"
 			done
 		done | head -1 >> tempfile06
-    elif [[ $(sort $i | uniq -c | gawk '{print $1}' | sort -n | grep "^$k$" | wc -l) -eq 1 ]]; then
+    elif [[ $(sort $i | uniq -c | gawk '{print $1}' | sort -n | grep -c "^$k$") -eq 1 ]]; then
 		sort $i | uniq -c | gawk '{print $1,$2}' | sort -n | grep "^$k " | gawk '{print $2}' >> tempfile06
     else
 		echo >> tempfile06
@@ -634,13 +634,13 @@ if [[ -e untranslated-names-only ]]; then
 
     for i in $(for j in `cat tempfile10`; do echo $j-tempfile09; done); do
 		k=`sort $i | uniq -c | gawk '{print $1}' | sort -n | tail -1`
-		if [[ $(sort $i | uniq -c | gawk '{print $1}' | sort -n | grep "^$k$" | wc -l) -ge 2 ]]; then
+		if [[ $(sort $i | uniq -c | gawk '{print $1}' | sort -n | grep -c "^$k$") -ge 2 ]]; then
 			for l in `cat $i`; do
 				for m in $(sort $i | uniq -c | gawk '{print $1,$2}' | sort -n | grep "^$k " | gawk '{print $2}'); do
 					echo $l | grep "^$m$"
 				done
 			done | head -1 >> tempfile11
-		elif [[ $(sort $i | uniq -c | gawk '{print $1}' | sort -n | grep "^$k$" | wc -l) -eq 1 ]]; then
+		elif [[ $(sort $i | uniq -c | gawk '{print $1}' | sort -n | grep -c "^$k$") -eq 1 ]]; then
 			sort $i | uniq -c | gawk '{print $1,$2}' | sort -n | grep "^$k " | gawk '{print $2}' >> tempfile11
 		else
 			echo >> tempfile11
@@ -3334,7 +3334,7 @@ fi
 echo -e "\npackage(){\n\n	# Extract package data" >> PKGBUILD
 echo "	$data_extract -f $data_tar_check -C \"\${pkgdir}\"" >> PKGBUILD
 if [[ -e pkgbuildinstallations1 ]] || [[ -e pkgbuildinstallations2 ]] || [[ -e pkgbuildinstallations32 ]] || [[ -e pkgbuildinstallations64 ]]; then
-	if [[ $(grep '^install' pkgbuildinstallations1 2> /dev/null | wc -l) != $(echo $(($(cat pkgbuildinstallations1 2> /dev/null | wc -l) + $(cat pkgbuildinstallations2 2> /dev/null | wc -l) + $(cat pkgbuildinstallations32 2> /dev/null | wc -l) + $(cat pkgbuildinstallations64 2> /dev/null | wc -l)))) ]]; then
+	if [[ $(grep -c '^install' pkgbuildinstallations1 2> /dev/null) != $(echo $(($(cat pkgbuildinstallations1 2> /dev/null | wc -l) + $(cat pkgbuildinstallations2 2> /dev/null | wc -l) + $(cat pkgbuildinstallations32 2> /dev/null | wc -l) + $(cat pkgbuildinstallations64 2> /dev/null | wc -l)))) ]]; then
 		echo -e "\n	# Fix directory structure differences\n	cd \"\${pkgdir}\"" >> PKGBUILD
 	fi
 fi
@@ -3381,7 +3381,7 @@ if [[ -e pkgbuildinstallations2 ]]; then
 	done
 fi
 if [[ -e pkgbuildinstallations1 ]] || [[ -e pkgbuildinstallations2 ]] || [[ -e pkgbuildinstallations32 ]] || [[ -e pkgbuildinstallations64 ]]; then
-	if [[ $(grep '^install' pkgbuildinstallations1 2> /dev/null | wc -l) != $(echo $(($(cat pkgbuildinstallations1 2> /dev/null | wc -l) + $(cat pkgbuildinstallations2 2> /dev/null | wc -l) + $(cat pkgbuildinstallations32 2> /dev/null | wc -l) + $(cat pkgbuildinstallations64 2> /dev/null | wc -l)))) ]]; then
+	if [[ $(grep -c '^install' pkgbuildinstallations1 2> /dev/null) != $(echo $(($(cat pkgbuildinstallations1 2> /dev/null | wc -l) + $(cat pkgbuildinstallations2 2> /dev/null | wc -l) + $(cat pkgbuildinstallations32 2> /dev/null | wc -l) + $(cat pkgbuildinstallations64 2> /dev/null | wc -l)))) ]]; then
 		echo -e "\n	cd .." >> PKGBUILD
 	fi
 fi
