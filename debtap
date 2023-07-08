@@ -606,13 +606,13 @@ packages-names-translator() {
 		fi
 	done
 
-	cat tempfile07 | sed s'/=/ = /g' | sed s'/>/ > /g' | sed s'/</ < /g' | sed s'/>  =/>=/g' | sed s'/<  =/<=/g' | sed s'/^lib32-\|-multilib$//g' > tempfile08
+	< tempfile07 sed s'/=/ = /g' | sed s'/>/ > /g' | sed s'/</ < /g' | sed s'/>  =/>=/g' | sed s'/<  =/<=/g' | sed s'/^lib32-\|-multilib$//g' > tempfile08
 
-	if [[ $(cat tempfile08 | wc -l) == 0 ]]; then
+	if [[ $(< tempfile08 wc -l) == 0 ]]; then
 		echo >> tempfile08
 	fi
 
-	cat tempfile08 | while read line; do
+	while read line; do
 		if [[ $(echo "$line" | wc -w) -eq 0 ]]; then
 			echo >> final-check-list
 		elif [[ $(echo "$line" | wc -w) -eq 1 ]] || [[ $(echo "$line" | wc -w) -eq 3 ]]; then
@@ -621,7 +621,7 @@ packages-names-translator() {
 			echo "$line" | gawk '{print $1,$2,$3}' >> final-check-list
 			echo "$line" | gawk '{print $1,$4,$5}' >> final-check-list
 		fi
-	done
+	done < tempfile08
 
 	for i in $(eval echo {1..$(cat $(ls | grep initial-check-list) | wc -l)}); do
 		if [[ $(sed -n ""$i"{p;q;}" final-check-list | gawk '{print $1}') == "" ]]; then
@@ -675,13 +675,13 @@ packages-names-translator() {
 			fi
 		done
 
-		cat tempfile13 | sed s'/=/ = /g' | sed s'/>/ > /g' | sed s'/</ < /g' | sed s'/>  =/>=/g' | sed s'/<  =/<=/g' | sed s'/^lib32-\|-multilib$//g' > tempfile14
+		< tempfile13 sed -e s'/=/ = /g' -e s'/>/ > /g' -e s'/</ < /g' -e s'/>  =/>=/g' -e s'/<  =/<=/g' -e s'/^lib32-\|-multilib$//g' > tempfile14
 
-		if [[ $(cat tempfile14 | wc -l) == 0 ]]; then
+		if [[ $(< tempfile14 wc -l) == 0 ]]; then
 			echo >> tempfile14
 		fi
 
-		cat tempfile14 | while read line; do
+		while read line; do
 			if [[ $(echo "$line" | wc -w) -eq 0 ]]; then
 				echo >> final-check-list
 			elif [[ $(echo "$line" | wc -w) -eq 1 ]] || [[ $(echo "$line" | wc -w) -eq 3 ]]; then
@@ -690,9 +690,9 @@ packages-names-translator() {
 				echo "$line" | gawk '{print $1,$2,$3}' >> final-check-list
 				echo "$line" | gawk '{print $1,$4,$5}' >> final-check-list
 			fi
-		done
+		done < tempfile14
 
-		for i in $(eval echo {1..$(cat untranslated | wc -l)}); do
+		for i in $(eval echo {1..$(< untranslated wc -l)}); do
 			if [[ $(tac final-check-list | sed -n ""$i"{p;q;}" | gawk '{print $1}') == "" ]]; then
 				echo $(tac untranslated | sed -n ""$i"{p;q;}") >> new-untranslated
 				echo $(tac untranslated | sed -n ""$i"{p;q;}" | gawk '{print $1}') >> new-untranslated-names-only
@@ -2746,7 +2746,7 @@ packages-names-translator() {
 
 	# Special rules for version control systems
 	touch tempfile16
-	cat tempfile15 | while read line; do
+	while read line; do
 		for i in {git,bzr,darcs,hg}; do
 			if [[ $(echo "$line" | gawk '{print $3}' | grep -q $i; echo $?) == 0 ]]; then
 				echo "$(echo $(echo "$line" | gawk '{print $1}')-$i | sed s"/-$i-$i$/-$i/") $(echo "$line" | gawk '{print $2}') $(echo "$line" | gawk '{print $3}' | gawk -F "$i" '{print $2}' | gawk -F '-' '{print $1}')" >> tempfile16
@@ -2768,19 +2768,19 @@ packages-names-translator() {
 		if [[ $(echo "$line" | gawk '{print $3}' | grep -q "svn\|git\|cvs\|CVS\|bzr\|darcs\|hg"; echo $?) != 0 ]]; then
 			echo "$(echo "$line" | gawk '{print $1}') $(echo "$line" | gawk '{print $2}') $(echo "$line" | gawk '{print $3}' | gawk -F '-[0-9]' '{print $1}' | sed s'/-/./')" >> tempfile16
 		fi
-	done
+	done < tempfile15
 
 	if [[ $pseudo != set ]]; then
 		mv tempfile16 tempfile17
 	else
 		# Special rules for multilib packages
 		touch tempfile17
-		cat tempfile16 | while read line; do
+		while read line; do
 			i=$(echo "$line" | gawk '{print $1}')
 			pacman -Ssq "lib32-$i" > result
 			grep -q "^lib32-$i$" result /var/cache/debtap/aur-packages && echo "$line" | sed s"/^$i/lib32-$i/" >> tempfile17
 			grep -q "^lib32-$i$" result /var/cache/debtap/aur-packages || echo "$line" >> tempfile17
-		done
+		done < tempfile16
 		rm -rf result
 	fi
 
@@ -2791,9 +2791,9 @@ packages-names-translator() {
 		# Appending namcap found dependencies
 		cat namcap-dependencies >> tempfile17
 		# Finding packages that own namcap found libraries
-		cat namcap-libraries | while read line; do
+		while read line; do
 			pkgfile "$line" >> "$line"-librariesfound
-		done
+		done < namcap-libraries
 		for i in $(ls *librariesfound 2> /dev/null); do
 			if [[ $(grep -q -E "^core(-testing)?/|^extra(-testing)?/|^multilib(-testing)?/" $i; echo $?) == 0 ]]; then
 				grep -E "^core(-testing)?/|^extra(-testing)?/|^multilib(-testing)?/" $i | head -1 | gawk -F / '{print $2}' >> tempfile17
@@ -2877,7 +2877,7 @@ if [[ $(grep -q ^Replaces: control; echo $?) == 0 ]]; then
     done
     sed -e s'/(/ /g' -e s'/)//g' tempfile01 | sort > tempfile02
     grep -v '^xlibs$\|^xlibs \|^libgl1$\|^libgl1 \|^libglu1$\|^libglu1 \|^default-jre$\|^default-jre \|^openjdk-[0-9]+-[jdk|jre]\|^libstdc[0-9]+$\|^libstdc[0-9]+ \|^qt[0-9]+-default$\|^qt[0-9]+-default \|^python:any$\|^python:any \|^libpango\|^libcupsys2$\|^libcupsys2 \|^jackd[0-9]*$\|^jackd[0-9]* \|^fonts-freefont-ttf$\|^fonts-freefont-ttf \|^fonts-liberation$\|^fonts-liberation \|^ttf-mscorefonts-installer$\|^ttf-mscorefonts-installer \|^dpkg$\|^dpkg \|^apt$\|^apt \|^apt-get$\|^apt-get \|^aptitude$\|^aptitude \|^debconf' tempfile02 > replacements-initial-check-list
-	if [[ $(cat replacements-initial-check-list | wc -l) == 0 ]]; then
+	if [[ $(< replacements-initial-check-list wc -l) == 0 ]]; then
 		echo >> replacements-initial-check-list
 	fi
 	packages-names-translator
@@ -2899,7 +2899,7 @@ if [[ $(grep -q ^Conflicts: control; echo $?) == 0 ]]; then
     done
     sed -e s'/(/ /g' -e s'/)//g' tempfile01 | sort > tempfile02
     grep -v '^xlibs$\|^xlibs \|^libgl1$\|^libgl1 \|^libglu1$\|^libglu1 \|^default-jre$\|^default-jre \|^openjdk-[0-9]+-[jdk|jre]\|^libstdc[0-9]+$\|^libstdc[0-9]+ \|^qt[0-9]+-default$\|^qt[0-9]+-default \|^python:any$\|^python:any \|^libpango\|^libcupsys2$\|^libcupsys2 \|^jackd[0-9]*$\|^jackd[0-9]* \|^fonts-freefont-ttf$\|^fonts-freefont-ttf \|^fonts-liberation$\|^fonts-liberation \|^ttf-mscorefonts-installer$\|^ttf-mscorefonts-installer \|^dpkg$\|^dpkg \|^apt$\|^apt \|^apt-get$\|^apt-get \|^aptitude$\|^aptitude \|^debconf' tempfile02 > conflicts-initial-check-list
-	if [[ $(cat conflicts-initial-check-list | wc -l) == 0 ]]; then
+	if [[ $(< conflicts-initial-check-list wc -l) == 0 ]]; then
 		echo >> conflicts-initial-check-list
 	fi
     packages-names-translator
@@ -2921,7 +2921,7 @@ if [[ $(grep -q ^Provides: control; echo $?) == 0 ]]; then
     done
     sed -e s'/(/ /g' -e s'/)//g' tempfile01 | sort > tempfile02
     grep -v '^xlibs$\|^xlibs \|^libgl1$\|^libgl1 \|^libglu1$\|^libglu1 \|^default-jre$\|^default-jre \|^openjdk-[0-9]+-[jdk|jre]\|^libstdc[0-9]+$\|^libstdc[0-9]+ \|^qt[0-9]+-default$\|^qt[0-9]+-default \|^python:any$\|^python:any \|^libpango\|^libcupsys2$\|^libcupsys2 \|^jackd[0-9]*$\|^jackd[0-9]* \|^fonts-freefont-ttf$\|^fonts-freefont-ttf \|^fonts-liberation$\|^fonts-liberation \|^ttf-mscorefonts-installer$\|^ttf-mscorefonts-installer \|^dpkg$\|^dpkg \|^apt$\|^apt \|^apt-get$\|^apt-get \|^aptitude$\|^aptitude \|^debconf' tempfile02 > provisions-initial-check-list
-	if [[ $(cat provisions-initial-check-list | wc -l) == 0 ]]; then
+	if [[ $(< provisions-initial-check-list wc -l) == 0 ]]; then
 		echo >> provisions-initial-check-list
 	fi
     packages-names-translator
@@ -2965,7 +2965,7 @@ if [[ $(grep -q '^Depends:\|^Pre-Depends:' control; echo $?) == 0 ]]; then
     done
     sed -e s'/(/ /g' -e s'/)//g' tempfile01 | sort > tempfile02
     grep -v '^xlibs$\|^xlibs \|^libgl1$\|^libgl1 \|^libglu1$\|^libglu1 \|^default-jre$\|^default-jre \|^openjdk-[0-9]+-[jdk|jre]\|^libstdc[0-9]+$\|^libstdc[0-9]+ \|^qt[0-9]+-default$\|^qt[0-9]+-default \|^python:any$\|^python:any \|^libpango\|^libcupsys2$\|^libcupsys2 \|^jackd[0-9]*$\|^jackd[0-9]* \|^fonts-freefont-ttf$\|^fonts-freefont-ttf \|^fonts-liberation$\|^fonts-liberation \|^ttf-mscorefonts-installer$\|^ttf-mscorefonts-installer \|^dpkg$\|^dpkg \|^apt$\|^apt \|^apt-get$\|^apt-get \|^aptitude$\|^aptitude \|^debconf' tempfile02 > dependencies-initial-check-list
-	if [[ $(cat dependencies-initial-check-list | wc -l) == 0 ]]; then
+	if [[ $(< dependencies-initial-check-list wc -l) == 0 ]]; then
 		echo >> dependencies-initial-check-list
 	fi
     packages-names-translator
@@ -2987,7 +2987,7 @@ if [[ $(grep -q '^Recommends:\|^Suggests:' control; echo $?) == 0 ]]; then
     done
     sed -e s'/(/ /g' -e s'/)//g' tempfile01 | sort > tempfile02
     grep -v '^xlibs$\|^xlibs \|^libgl1$\|^libgl1 \|^libglu1$\|^libglu1 \|^default-jre$\|^default-jre \|^openjdk-[0-9]+-[jdk|jre]\|^libstdc[0-9]+$\|^libstdc[0-9]+ \|^qt[0-9]+-default$\|^qt[0-9]+-default \|^python:any$\|^python:any \|^libpango\|^libcupsys2$\|^libcupsys2 \|^jackd[0-9]*$\|^jackd[0-9]* \|^fonts-freefont-ttf$\|^fonts-freefont-ttf \|^fonts-liberation$\|^fonts-liberation \|^ttf-mscorefonts-installer$\|^ttf-mscorefonts-installer \|^dpkg$\|^dpkg \|^apt$\|^apt \|^apt-get$\|^apt-get \|^aptitude$\|^aptitude \|^debconf' tempfile02 > optional-dependencies-initial-check-list
-	if [[ $(cat optional-dependencies-initial-check-list | wc -l) == 0 ]]; then
+	if [[ $(< optional-dependencies-initial-check-list wc -l) == 0 ]]; then
 		echo >> optional-dependencies-initial-check-list
 	fi
     packages-names-translator
@@ -3413,54 +3413,54 @@ fi
 echo -e "\npackage(){\n\n	# Extract package data" >> PKGBUILD
 echo "	$data_extract -f $data_tar_check -C \"\${pkgdir}\"" >> PKGBUILD
 if [[ -e pkgbuildinstallations1 ]] || [[ -e pkgbuildinstallations2 ]] || [[ -e pkgbuildinstallations32 ]] || [[ -e pkgbuildinstallations64 ]]; then
-	if [[ $(grep '^install' pkgbuildinstallations1 2> /dev/null | wc -l) != $(($(cat pkgbuildinstallations1 2> /dev/null | wc -l) + $(cat pkgbuildinstallations2 2> /dev/null | wc -l) + $(cat pkgbuildinstallations32 2> /dev/null | wc -l) + $(cat pkgbuildinstallations64 2> /dev/null | wc -l))) ]]; then
+	if [[ $(grep '^install' pkgbuildinstallations1 2> /dev/null | wc -l) != $(($(wc -l 2> /dev/null < pkgbuildinstallations1) + $(wc -l 2> /dev/null < pkgbuildinstallations2) + $(wc -l 2> /dev/null < pkgbuildinstallations32) + $(wc -l 2> /dev/null < pkgbuildinstallations64))) ]]; then
 		echo -e "\n	# Fix directory structure differences\n	cd \"\${pkgdir}\"" >> PKGBUILD
 	fi
 fi
 if [[ -e pkgbuildinstallations1 ]]; then
 	echo >> PKGBUILD
-	cat pkgbuildinstallations1 | while read -r line; do
+	while read -r line; do
 		echo -e "	$line" >> PKGBUILD
-	done
+	done < pkgbuildinstallations1
 fi
 if [[ $(grep -q "^arch=('i686' 'x86_64')$" PKGBUILD; echo $?) == 0 ]]; then
 	if [[ -e pkgbuildinstallations32 ]] && [[ -e pkgbuildinstallations64 ]]; then
 		echo -e "\n	if [[ \${CARCH} == i686 ]]; then" >> PKGBUILD
-		cat pkgbuildinstallations32 | while read -r line; do
+		while read -r line; do
 			echo "		$line" >> PKGBUILD
-		done
+		done < pkgbuildinstallations32
 		echo "	elif [[ \${CARCH} == x86_64 ]]; then" >> PKGBUILD
-		cat pkgbuildinstallations64 | while read -r line; do
+		while read -r line; do
 			echo "		$line" >> PKGBUILD
-		done
+		done < pkgbuildinstallations64
 		echo "	fi" >> PKGBUILD
 	elif [[ -e pkgbuildinstallations32 ]] && [[ ! -e pkgbuildinstallations64 ]]; then
 		echo -e "\n	if [[ \${CARCH} == i686 ]]; then" >> PKGBUILD
-		cat pkgbuildinstallations32 | while read -r line; do
+		while read -r line; do
 			echo "		$line" >> PKGBUILD
-		done
+		done < pkgbuildinstallations32
 		echo "	fi" >> PKGBUILD
 	elif [[ ! -e pkgbuildinstallations32 ]] && [[ -e pkgbuildinstallations64 ]]; then
 		echo -e "\n	if [[ \${CARCH} == x86_64 ]]; then" >> PKGBUILD
-		cat pkgbuildinstallations64 | while read -r line; do
+		while read -r line; do
 			echo "		$line" >> PKGBUILD
-		done
+		done < pkgbuildinstallations64
 		echo "	fi" >> PKGBUILD
 	fi
 elif [[ $(grep -q "^arch=('x86_64')$" PKGBUILD; echo $?) == 0 ]] && [[ -e pkgbuildinstallations64 ]]; then
 	echo >> PKGBUILD
-	cat pkgbuildinstallations64 | while read -r line; do
+	while read -r line; do
 		echo -e "	$line" >> PKGBUILD
-	done
+	done < pkgbuildinstallations64
 fi
 if [[ -e pkgbuildinstallations2 ]]; then
 	echo >> PKGBUILD
-	cat pkgbuildinstallations2 | while read -r line; do
+	while read -r line; do
 		echo -e "	$line" >> PKGBUILD
-	done
+	done < pkgbuildinstallations2
 fi
 if [[ -e pkgbuildinstallations1 ]] || [[ -e pkgbuildinstallations2 ]] || [[ -e pkgbuildinstallations32 ]] || [[ -e pkgbuildinstallations64 ]]; then
-	if [[ $(grep '^install' pkgbuildinstallations1 2> /dev/null | wc -l) != $(($(cat pkgbuildinstallations1 2> /dev/null | wc -l) + $(cat pkgbuildinstallations2 2> /dev/null | wc -l) + $(cat pkgbuildinstallations32 2> /dev/null | wc -l) + $(cat pkgbuildinstallations64 2> /dev/null | wc -l))) ]]; then
+	if [[ $(grep '^install' pkgbuildinstallations1 2> /dev/null | wc -l) != $(($(wc -l 2> /dev/null < pkgbuildinstallations1) + $(wc -l 2> /dev/null < pkgbuildinstallations2) + $(wc -l 2> /dev/null < pkgbuildinstallations32) + $(wc -l 2> /dev/null < pkgbuildinstallations64))) ]]; then
 		echo -e "\n	cd .." >> PKGBUILD
 	fi
 fi
