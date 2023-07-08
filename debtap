@@ -2679,32 +2679,34 @@ if [[ -e optional-dependencies-untranslated-names-only ]]; then
 fi
 
 # Appending ready translated names (if any needed) to the translated packages names list
-grep -q "^fonts-freefont-ttf$\|^fonts-freefont-ttf " tempfile02 && echo ttf-freefont >> final-check-list
-grep -q "^fonts-liberation$\|^fonts-liberation " tempfile02 && echo ttf-liberation >> final-check-list
-grep -q "^ttf-mscorefonts-installer$\|^ttf-mscorefonts-installer " tempfile02 && echo ttf-ms-fonts >> final-check-list
-grep -q "^default-jre$\|^default-jre " tempfile02 && echo java-runtime >> final-check-list
-grep -q "^python:any$\|^python:any " tempfile02 && echo python >> final-check-list
-grep "^openjdk-[0-9]+-jdk$\|^openjdk-[0-9]+-jdk " tempfile02 | sort -uV | tail -1 | sed s"/openjdk-\([0-9]\+\)-jdk/jdk\1-openjdk/g" | sed s'/=/= /g' | sed s'/>/> /g' | sed s'/</< /g' | sed s'/> =/>=/g' | sed s'/< =/<=/g' >> final-check-list
-grep "^openjdk-[0-9]+-jre\(-headless\)\?$\|^openjdk-[0-9]+-jre\(-headless\)\? " tempfile02 | sort -uV | tail -1 | sed s"/openjdk-\([0-9]\+\)-jre/jre\1-openjdk/g" | sed s'/=/= /g' | sed s'/>/> /g' | sed s'/</< /g' | sed s'/> =/>=/g' | sed s'/< =/<=/g' >> final-check-list
-grep "^libstdc[0-9]+$\|libstdc[0-9]+ " tempfile02 | sort -uV | tail -1 | sed s"/libstdc\([0-9]\+\)/$(pacman -Ssq libstdc | sort -uV | tail -1)/g" | sed s'/=/= /g' | sed s'/>/> /g' | sed s'/</< /g' | sed s'/> =/>=/g' | sed s'/< =/<=/g' >> final-check-list
-grep "^qt[0-9]+-default$\|qt[0-9]+-default " tempfile02 | sed s"/qt\([0-9]\+\)-default/qt\1-base/g" | sed s'/=/= /g' | sed s'/>/> /g' | sed s'/</< /g' | sed s'/> =/>=/g' | sed s'/< =/<=/g' >> final-check-list
+{
+grep -q "^fonts-freefont-ttf$\|^fonts-freefont-ttf " tempfile02 && echo ttf-freefont
+grep -q "^fonts-liberation$\|^fonts-liberation " tempfile02 && echo ttf-liberation
+grep -q "^ttf-mscorefonts-installer$\|^ttf-mscorefonts-installer " tempfile02 && echo ttf-ms-fonts
+grep -q "^default-jre$\|^default-jre " tempfile02 && echo java-runtime
+grep -q "^python:any$\|^python:any " tempfile02 && echo python
+grep "^openjdk-[0-9]+-jdk$\|^openjdk-[0-9]+-jdk " tempfile02 | sort -uV | tail -1 | sed s"/openjdk-\([0-9]\+\)-jdk/jdk\1-openjdk/g" | sed s'/=/= /g' | sed s'/>/> /g' | sed s'/</< /g' | sed s'/> =/>=/g' | sed s'/< =/<=/g'
+grep "^openjdk-[0-9]+-jre\(-headless\)\?$\|^openjdk-[0-9]+-jre\(-headless\)\? " tempfile02 | sort -uV | tail -1 | sed s"/openjdk-\([0-9]\+\)-jre/jre\1-openjdk/g" | sed s'/=/= /g' | sed s'/>/> /g' | sed s'/</< /g' | sed s'/> =/>=/g' | sed s'/< =/<=/g'
+grep "^libstdc[0-9]+$\|libstdc[0-9]+ " tempfile02 | sort -uV | tail -1 | sed s"/libstdc\([0-9]\+\)/$(pacman -Ssq libstdc | sort -uV | tail -1)/g" | sed s'/=/= /g' | sed s'/>/> /g' | sed s'/</< /g' | sed s'/> =/>=/g' | sed s'/< =/<=/g'
+grep "^qt[0-9]+-default$\|qt[0-9]+-default " tempfile02 | sed s"/qt\([0-9]\+\)-default/qt\1-base/g" | sed s'/=/= /g' | sed s'/>/> /g' | sed s'/</< /g' | sed s'/> =/>=/g' | sed s'/< =/<=/g'
 if [[ $pseudo != set ]]; then
-	grep -q "^xlibs$\|^xlibs " tempfile02 && echo libx11 >> final-check-list
-	grep -q "^libgl1$\|^libgl1 " tempfile02 && echo libgl >> final-check-list
-	grep -q "^libglu1$\|^libglu1 " tempfile02 && echo glu >> final-check-list
-	grep "^libpango$\|^libpango " tempfile02 | sed s"/libpango/pango/g" | sed s'/=/= /g' | sed s'/>/> /g' | sed s'/</< /g' | sed s'/> =/>=/g' | sed s'/< =/<=/g' >> final-check-list
-	grep "^libpangomm$\|^libpangomm " tempfile02 | sed s"/libpangomm/pangomm/g" | sed s'/=/= /g' | sed s'/>/> /g' | sed s'/</< /g' | sed s'/> =/>=/g' | sed s'/< =/<=/g' >> final-check-list
-	grep "^libcupsys2$\|^libcupsys2 " tempfile02 | sed s"/libcupsys2/libcups/g" | sed s'/=/= /g' | sed s'/>/> /g' | sed s'/</< /g' | sed s'/> =/>=/g' | sed s'/< =/<=/g' >> final-check-list
-	grep "^jackd[0-9]*$\|^jackd-[0-9]* " tempfile02 | sort -uV | tail -1 | sed s"/jackd\([0-9]\*\)/jack\1/g" | sed s'/=/= /g' | sed s'/>/> /g' | sed s'/</< /g' | sed s'/> =/>=/g' | sed s'/< =/<=/g' >> final-check-list
+	grep -q "^xlibs$\|^xlibs " tempfile02 && echo libx11
+	grep -q "^libgl1$\|^libgl1 " tempfile02 && echo libgl
+	grep -q "^libglu1$\|^libglu1 " tempfile02 && echo glu
+	grep "^libpango$\|^libpango " tempfile02 | sed s"/libpango/pango/g" | sed s'/=/= /g' | sed s'/>/> /g' | sed s'/</< /g' | sed s'/> =/>=/g' | sed s'/< =/<=/g'
+	grep "^libpangomm$\|^libpangomm " tempfile02 | sed s"/libpangomm/pangomm/g" | sed s'/=/= /g' | sed s'/>/> /g' | sed s'/</< /g' | sed s'/> =/>=/g' | sed s'/< =/<=/g'
+	grep "^libcupsys2$\|^libcupsys2 " tempfile02 | sed s"/libcupsys2/libcups/g" | sed s'/=/= /g' | sed s'/>/> /g' | sed s'/</< /g' | sed s'/> =/>=/g' | sed s'/< =/<=/g'
+	grep "^jackd[0-9]*$\|^jackd-[0-9]* " tempfile02 | sort -uV | tail -1 | sed s"/jackd\([0-9]\*\)/jack\1/g" | sed s'/=/= /g' | sed s'/>/> /g' | sed s'/</< /g' | sed s'/> =/>=/g' | sed s'/< =/<=/g'
 else
-	grep -q "^xlibs$\|^xlibs " tempfile02 && echo lib32-libx11 >> final-check-list
-	grep -q "^libgl1$\|^libgl1 " tempfile02 && echo lib32-libgl >> final-check-list
-	grep -q "^libglu1$\|^libglu1 " tempfile02 && echo lib32-glu >> final-check-list
-	grep "^libpango$\|^libpango " tempfile02 | sed s"/libpango/lib32-pango/g" | sed s'/=/= /g' | sed s'/>/> /g' | sed s'/</< /g' | sed s'/> =/>=/g' | sed s'/< =/<=/g' >> final-check-list
-	grep "^libpangomm$\|^libpangomm " tempfile02 | sed s"/libpangomm/lib32-pangomm/g" | sed s'/=/= /g' | sed s'/>/> /g' | sed s'/</< /g' | sed s'/> =/>=/g' | sed s'/< =/<=/g' >> final-check-list
-	grep "^libcupsys2$\|^libcupsys2 " tempfile02 | sed s"/libcupsys2/lib32-libcups/g" | sed s'/=/= /g' | sed s'/>/> /g' | sed s'/</< /g' | sed s'/> =/>=/g' | sed s'/< =/<=/g' >> final-check-list
-	grep "^jackd[0-9]*$\|^jackd-[0-9]* " tempfile02 | sort -uV | tail -1 | sed s"/jackd\([0-9]\*\)/lib32-jack\1/g" | sed s'/=/= /g' | sed s'/>/> /g' | sed s'/</< /g' | sed s'/> =/>=/g' | sed s'/< =/<=/g' >> final-check-list
+	grep -q "^xlibs$\|^xlibs " tempfile02 && echo lib32-libx11
+	grep -q "^libgl1$\|^libgl1 " tempfile02 && echo lib32-libgl
+	grep -q "^libglu1$\|^libglu1 " tempfile02 && echo lib32-glu
+	grep "^libpango$\|^libpango " tempfile02 | sed s"/libpango/lib32-pango/g" | sed s'/=/= /g' | sed s'/>/> /g' | sed s'/</< /g' | sed s'/> =/>=/g' | sed s'/< =/<=/g'
+	grep "^libpangomm$\|^libpangomm " tempfile02 | sed s"/libpangomm/lib32-pangomm/g" | sed s'/=/= /g' | sed s'/>/> /g' | sed s'/</< /g' | sed s'/> =/>=/g' | sed s'/< =/<=/g'
+	grep "^libcupsys2$\|^libcupsys2 " tempfile02 | sed s"/libcupsys2/lib32-libcups/g" | sed s'/=/= /g' | sed s'/>/> /g' | sed s'/</< /g' | sed s'/> =/>=/g' | sed s'/< =/<=/g'
+	grep "^jackd[0-9]*$\|^jackd-[0-9]* " tempfile02 | sort -uV | tail -1 | sed s"/jackd\([0-9]\*\)/lib32-jack\1/g" | sed s'/=/= /g' | sed s'/>/> /g' | sed s'/</< /g' | sed s'/> =/>=/g' | sed s'/< =/<=/g'
 fi
+} >> final-check-list
 
 # Stripping unnecessary symbols and words from packages versions
 grep -v "^$" final-check-list | while read line; do
@@ -3045,15 +3047,19 @@ if [[ $(($(grep "[[:blank:]]" -o tempfile1 | wc -l) + 16)) != $(($(wc -c < tempf
 fi
 
 if [[ $(grep -q '^pre_install() {$' tempfile2 2> /dev/null; echo $?) == 0 ]]; then
-	echo -e "\npre_upgrade() {" >> tempfile2
-	echo -e "\tpre_install" >> tempfile2
-	echo "}" >> tempfile2
+	{
+	echo -e "\npre_upgrade() {"
+	echo -e "\tpre_install"
+	echo "}"
+	} >> tempfile2
 fi
 
 if [[ $(grep -q '^post_install() {$' tempfile2 2> /dev/null; echo $?) == 0 ]]; then
-	echo -e "\npost_upgrade() {" >> tempfile2
-	echo -e "\tpost_install" >> tempfile2
-	echo "}" >> tempfile2
+	{
+	echo -e "\npost_upgrade() {"
+	echo -e "\tpost_install"
+	echo "}"
+	} >> tempfile2
 fi
 
 echo -e "\npre_remove() {" > tempfile1
@@ -3212,38 +3218,40 @@ fi
 
 # Generating PKGBUILD file
 echo -e "\n${lightgreen}==>${NC} ${bold}Generating PKGBUILD file...${normal}"
-echo "# Generated by debtap" > PKGBUILD
+{
+echo "# Generated by debtap"
 if [[ $quiet == set  ]] || [[ $Quiet == set ]]; then
-	echo "# Maintainer: " >> PKGBUILD
-	echo "# Contributor: " >> PKGBUILD
+	echo "# Maintainer: "
+	echo "# Contributor: "
 else
-	echo "# Maintainer: $(grep '^packager =' .PKGINFO | gawk '{print $3}')" >> PKGBUILD
-	echo "# Contributor: $(grep '^packager =' .PKGINFO | gawk '{print $3}')" >> PKGBUILD
+	echo "# Maintainer: $(grep '^packager =' .PKGINFO | gawk '{print $3}')"
+	echo "# Contributor: $(grep '^packager =' .PKGINFO | gawk '{print $3}')"
 fi
 if [[ $(grep -q '^pkgname = lib32-' .PKGINFO; echo $?) != 0 ]] && [[ $(grep '^pkgname =' .PKGINFO | grep -q -- '-multilib$'; echo $?) != 0 ]] && [[ $(ls -A usr/bin 2> /dev/null) ]]; then
-	echo "$(grep '^pkgname =' .PKGINFO | sed s'/ //g')-bin" >> PKGBUILD
+	echo "$(grep '^pkgname =' .PKGINFO | sed s'/ //g')-bin"
 else
-	echo "$(grep '^pkgname =' .PKGINFO | sed s'/ //g')" >> PKGBUILD
+	echo "$(grep '^pkgname =' .PKGINFO | sed s'/ //g')"
 fi
-echo "$(grep '^pkgver =' .PKGINFO | sed -e s'/ //g' -e s'/-/ /g' | gawk '{print $1}')" >> PKGBUILD
-echo "pkgrel=$(grep '^pkgver =' .PKGINFO | sed -e s'/ //g' -e s'/-/ /g' | gawk '{print $2}')" >> PKGBUILD
-echo "$(grep '^pkgdesc =' .PKGINFO | sed s'/ = /="/')\"" >> PKGBUILD
+echo "$(grep '^pkgver =' .PKGINFO | sed -e s'/ //g' -e s'/-/ /g' | gawk '{print $1}')"
+echo "pkgrel=$(grep '^pkgver =' .PKGINFO | sed -e s'/ //g' -e s'/-/ /g' | gawk '{print $2}')"
+echo "$(grep '^pkgdesc =' .PKGINFO | sed s'/ = /="/')\""
 if [[ $(grep -q '^pkgname = lib32-' .PKGINFO; echo $?) != 0 ]] && [[ $(grep '^pkgname =' .PKGINFO | grep -q -- '-multilib$'; echo $?) != 0 ]]; then
 	if [[ $(grep -q '^arch = i686$' .PKGINFO; echo $?) == 0 ]] || [[ $(grep -q '^arch = x86_64$' .PKGINFO; echo $?) == 0 ]]; then
-		echo "arch=('i686' 'x86_64')" >> PKGBUILD
+		echo "arch=('i686' 'x86_64')"
 	elif [[ $(grep -q '^arch = armv7l$' .PKGINFO; echo $?) == 0 ]]; then
-		echo "arch=('armv7l')" >> PKGBUILD
+		echo "arch=('armv7l')"
 	elif [[ $(grep -q '^arch = aarch64$' .PKGINFO; echo $?) == 0 ]]; then
-		echo "arch=('aarch64')" >> PKGBUILD
+		echo "arch=('aarch64')"
 	elif [[ $(grep -q '^arch = any$' .PKGINFO; echo $?) == 0 ]]; then
-		echo "arch=('any')" >> PKGBUILD
+		echo "arch=('any')"
 	fi
 else
-	echo "arch=('x86_64')" >> PKGBUILD
+	echo "arch=('x86_64')"
 fi
-echo "$(grep '^url =' .PKGINFO | sed s'/ //g' | sed s'/=/="/')\"" >> PKGBUILD
-echo "license=('$(echo $(grep '^license =' .PKGINFO | gawk '{print $3}') | sed s"/ /' '/g")')" >> PKGBUILD
-echo "groups=('')" >> PKGBUILD
+echo "$(grep '^url =' .PKGINFO | sed s'/ //g' | sed s'/=/="/')\""
+echo "license=('$(echo $(grep '^license =' .PKGINFO | gawk '{print $3}') | sed s"/ /' '/g")')"
+echo "groups=('')"
+} >> PKGBUILD
 if [[ $(grep -q '^pkgname = lib32-' .PKGINFO; echo $?) != 0 ]] && [[ $(grep '^pkgname =' .PKGINFO | grep -q -- '-multilib$'; echo $?) != 0 ]] && [[ $(grep -q '^depend =' .PKGINFO; echo $?) == 0 ]]; then
 	if [[ $(grep -q '^pkgname = lib32-' .PKGINFO; echo $?) != 0 ]] && [[ $(grep '^pkgname =' .PKGINFO | grep -q -- '-multilib$'; echo $?) != 0 ]] && [[ $(echo $(grep '^depend =' .PKGINFO | gawk '{print $3}')) != $(echo $(grep '^depend =' .PKGINFO | gawk '{print $3}' | sed s'/^lib32-\|-multilib$//g')) ]]; then
 		if [[ $(grep -q '^arch = i686$' .PKGINFO; echo $?) == 0 ]] || [[ $(grep -q '^arch = x86_64$' .PKGINFO; echo $?) == 0 ]]; then
@@ -3331,18 +3339,22 @@ if [[ $pseudo != set ]]; then
 else
 	echo "sha512sums=('$(sha512sum "$package_with_full_path" | gawk '{print $1}')')" >> PKGBUILD
 fi
-echo -e "\npackage(){\n\n	# Extract package data" >> PKGBUILD
-echo "	$data_extract -f $data_tar_check -C \"\${pkgdir}\"" >> PKGBUILD
+{
+echo -e "\npackage(){\n\n	# Extract package data"
+echo "	$data_extract -f $data_tar_check -C \"\${pkgdir}\""
+} >> PKGBUILD
 if [[ -e pkgbuildinstallations1 ]] || [[ -e pkgbuildinstallations2 ]] || [[ -e pkgbuildinstallations32 ]] || [[ -e pkgbuildinstallations64 ]]; then
 	if [[ $(grep '^install' pkgbuildinstallations1 2> /dev/null | wc -l) != $(($(cat pkgbuildinstallations1 2> /dev/null | wc -l) + $(cat pkgbuildinstallations2 2> /dev/null | wc -l) + $(cat pkgbuildinstallations32 2> /dev/null | wc -l) + $(cat pkgbuildinstallations64 2> /dev/null | wc -l))) ]]; then
 		echo -e "\n	# Fix directory structure differences\n	cd \"\${pkgdir}\"" >> PKGBUILD
 	fi
 fi
 if [[ -e pkgbuildinstallations1 ]]; then
-	echo >> PKGBUILD
+	{
+	echo
 	cat pkgbuildinstallations1 | while read -r line; do
-		echo -e "	$line" >> PKGBUILD
+		echo -e "	$line"
 	done
+	} >> PKGBUILD
 fi
 if [[ $(grep -q "^arch=('i686' 'x86_64')$" PKGBUILD; echo $?) == 0 ]]; then
 	if [[ -e pkgbuildinstallations32 ]] && [[ -e pkgbuildinstallations64 ]]; then
